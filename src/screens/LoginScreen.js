@@ -11,22 +11,37 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { registerUser, loginUser } from "../helpers/api";
+
 const AuthScreen = () => {
   const navigation = useNavigation();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleAuth = () => {
-    if (isSignUp) {
-      // Placeholder for sign-up logic (no backend)
-      Alert.alert("Success", "Account Created Successfully");
-      setIsSignUp(false);
-    } else {
-      // Placeholder for sign-in logic (no backend)
-      Alert.alert("Success", "Logged in successfully");
-      navigation.navigate("Home");
-      // Typically, you'd navigate to another screen after successful login
+  const handleAuth = async () => {
+    try {
+      if (isSignUp) {
+        const response = await registerUser(name, email, password);
+        if (response.status === "ok") {
+          Alert.alert("Success", "Account Created Successfully");
+          setIsSignUp(false);
+          navigation.navigate("Home"); // Navigate to Home screen
+        } else {
+          Alert.alert("Error", response.data);
+        }
+      } else {
+        const response = await loginUser(email, password);
+        if (response.status === "ok") {
+          Alert.alert("Success", "Logged in successfully");
+          navigation.navigate("Home"); // Navigate to Home screen
+        } else {
+          Alert.alert("Error", response.data);
+        }
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
     }
   };
 
@@ -52,6 +67,14 @@ const AuthScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        {isSignUp && (
+          <TextInput
+            placeholder='Name'
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+          />
+        )}
         <TextInput
           placeholder='Email'
           style={styles.input}
