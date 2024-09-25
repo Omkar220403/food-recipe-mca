@@ -21,27 +21,34 @@ const AuthScreen = () => {
   const [password, setPassword] = useState("");
 
   const handleAuth = async () => {
+    if (!email || !password || (isSignUp && !name)) {
+      Alert.alert("Validation Error", "Please fill in all fields.");
+      return;
+    }
+
     try {
+      let response;
       if (isSignUp) {
-        const response = await registerUser(name, email, password);
-        if (response.status === "ok") {
-          Alert.alert("Success", "Account Created Successfully");
-          setIsSignUp(false);
-          navigation.navigate("Home"); // Navigate to Home screen
-        } else {
-          Alert.alert("Error", response.data);
-        }
+        response = await registerUser(name, email, password);
       } else {
-        const response = await loginUser(email, password);
-        if (response.status === "ok") {
-          Alert.alert("Success", "Logged in successfully");
-          navigation.navigate("Home"); // Navigate to Home screen
-        } else {
-          Alert.alert("Error", response.data);
-        }
+        response = await loginUser(email, password);
+      }
+
+      if (response.status === "ok") {
+        Alert.alert(
+          "Success",
+          isSignUp ? "Account Created Successfully" : "Logged in successfully"
+        );
+        navigation.navigate("MainDrawer", { screen: "HomeScreen" }); // Change to "Drawer" and screen: "Home" for DrawerNavigator
+      } else {
+        Alert.alert("Error", response.data || "An unknown error occurred");
       }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      console.error("API call failed:", error);
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "An unknown error occurred"
+      );
     }
   };
 
