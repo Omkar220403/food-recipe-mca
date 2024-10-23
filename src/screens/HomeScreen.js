@@ -1,18 +1,7 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, Text, ScrollView, TextInput, Alert } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import { MagnifyingGlassIcon } from "react-native-heroicons/outline";
 import Categories from "../components/categories";
 import axios from "axios";
@@ -91,36 +80,36 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View className='flex-1 bg-white'>
       <StatusBar style='dark' />
       <ScrollView
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 50 }}
-        style={styles.scrollView}
+        className='pb-12'
       >
         {/* Greetings and punchline */}
-        <View style={styles.greetingsContainer}>
-          <Text style={styles.greetingText}>Hello, Omkar!</Text>
-          <View>
-            <Text style={styles.punchlineText}>Make your own food,</Text>
-          </View>
-          <Text style={styles.punchlineText}>
-            stay at <Text style={styles.highlightText}>home</Text>
+        <View className='mx-4 mb-4'>
+          <Text className='text-gray-500 text-sm'>Hello, Omkar!</Text>
+          <Text className='text-4xl font-semibold text-black'>
+            Make your own food,
+          </Text>
+          <Text className='text-4xl font-semibold text-black'>
+            stay at <Text className='text-yellow-400'>home</Text>
           </Text>
         </View>
 
         {/* Search */}
-        <View style={styles.searchContainer}>
+        <View className='flex-row items-center bg-gray-100 rounded-full px-4 mx-4 mb-4'>
           <TextInput
             placeholder='Search any recipe'
-            placeholderTextColor={"gray"}
-            style={styles.searchInput}
+            placeholderTextColor='gray'
+            className='flex-1 text-sm py-2 px-4'
             onChangeText={setSearchText}
             value={searchText}
           />
-          <View style={styles.searchIconContainer}>
+          <View className='bg-white p-2 rounded-full'>
             <MagnifyingGlassIcon
-              size={hp(2.5)}
+              size={20}
               strokeWidth={3}
               color='gray'
             />
@@ -149,48 +138,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-  scrollView: {
-    paddingBottom: 50,
-  },
-  greetingsContainer: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  greetingText: {
-    fontSize: hp(1.7),
-    color: "gray",
-  },
-  punchlineText: {
-    fontSize: hp(3.8),
-    fontWeight: "600",
-    color: "black",
-  },
-  highlightText: {
-    color: "#FFC107",
-  },
-  searchContainer: {
-    marginHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 25,
-    backgroundColor: "#f5f5f5",
-    paddingHorizontal: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: hp(1.7),
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  searchIconContainer: {
-    backgroundColor: "white",
-    borderRadius: 25,
-    padding: 8,
-  },
-});

@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react"; // Import useCallback
 import {
   View,
   Text,
   TextInput,
   Button,
-  StyleSheet,
   TouchableOpacity,
   Image,
+  Pressable,
+  Alert, // Import Alert for error handling
 } from "react-native";
 import axios from "axios";
-import MasonryList from "@react-native-seoul/masonry-list"; // Import MasonryList
-import Loading from "../components/loading"; // Import Loading component
-import { heightPercentageToDP as hp } from "react-native-responsive-screen"; // For responsive height
-import Animated, { FadeInDown } from "react-native-reanimated"; // Import animation library
+import MasonryList from "@react-native-seoul/masonry-list";
+import Loading from "../components/loading";
+import { CachedImage } from "../helpers/image";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 
 export default function AddIngredientsScreen() {
@@ -22,7 +24,7 @@ export default function AddIngredientsScreen() {
   const [suggestedRecipes, setSuggestedRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleAddIngredient = async () => {
+  const handleAddIngredient = useCallback(async () => {
     const trimmedIngredient = ingredient.trim();
     if (trimmedIngredient && !ingredientsList.includes(trimmedIngredient)) {
       const updatedList = [...ingredientsList, trimmedIngredient];
@@ -31,49 +33,58 @@ export default function AddIngredientsScreen() {
       setLoading(true); // Start loading
       await fetchRecipes(updatedList); // Wait for fetching to complete
       setLoading(false); // End loading
+    } else {
+      Alert.alert("Invalid ingredient", "Please enter a valid ingredient.");
     }
-  };
+  }, [ingredient, ingredientsList]);
 
-  const handleRemoveIngredient = index => {
-    const updatedList = ingredientsList.filter((_, i) => i !== index);
-    setIngredientsList(updatedList);
-    fetchRecipes(updatedList); // Re-fetch recipes based on updated ingredients
-  };
+  const handleRemoveIngredient = useCallback(
+    index => {
+      const updatedList = ingredientsList.filter((_, i) => i !== index);
+      setIngredientsList(updatedList);
+      setLoading(true); // Start loading when removing
+      fetchRecipes(updatedList).then(() => setLoading(false)); // Re-fetch recipes and stop loading
+    },
+    [ingredientsList]
+  );
 
-  const fetchRecipes = async (ingredients = ingredientsList) => {
-    try {
-      const recipeMap = {};
-      const fetchPromises = ingredients.map(ing =>
-        axios.get(`https://themealdb.com/api/json/v1/1/filter.php?i=${ing}`)
-      );
+  const fetchRecipes = useCallback(
+    async (ingredients = ingredientsList) => {
+      try {
+        const recipeMap = {};
+        const fetchPromises = ingredients.map(ing =>
+          axios.get(`https://themealdb.com/api/json/v1/1/filter.php?i=${ing}`)
+        );
 
-      const responses = await Promise.all(fetchPromises);
+        const responses = await Promise.all(fetchPromises);
 
-      responses.forEach(response => {
-        if (response && response.data && response.data.meals) {
-          response.data.meals.forEach(meal => {
-            if (recipeMap[meal.idMeal]) {
-              recipeMap[meal.idMeal].count += 1;
-            } else {
-              recipeMap[meal.idMeal] = { ...meal, count: 1 };
-            }
-          });
-        }
-      });
+        responses.forEach(response => {
+          if (response && response.data && response.data.meals) {
+            response.data.meals.forEach(meal => {
+              if (recipeMap[meal.idMeal]) {
+                recipeMap[meal.idMeal].count += 1;
+              } else {
+                recipeMap[meal.idMeal] = { ...meal, count: 1 };
+              }
+            });
+          }
+        });
 
-      const filteredRecipes = Object.values(recipeMap).filter(
-        meal => meal.count === ingredients.length
-      );
+        const filteredRecipes = Object.values(recipeMap).filter(
+          meal => meal.count === ingredients.length
+        );
 
-      setSuggestedRecipes(filteredRecipes);
-    } catch (err) {
-      console.log("Error fetching recipes:", err.message);
-      // Optional: Show an alert or error message to the user
-    }
-  };
+        setSuggestedRecipes(filteredRecipes);
+      } catch (err) {
+        console.log("Error fetching recipes:", err.message);
+        Alert.alert("Error", "Unable to fetch recipes. Please try again.");
+      }
+    },
+    [ingredientsList]
+  );
 
-  const renderRecipeCard = (item, index) => {
-    let isEven = index % 2 === 0; // Determine if index is even for styling
+  const RenderRecipeCard = ({ item, index, navigation }) => {
+    let isEven = index % 2 === 0;
 
     return (
       <Animated.View
@@ -81,159 +92,97 @@ export default function AddIngredientsScreen() {
           .duration(600)
           .springify()
           .damping(12)}
-        style={styles.recipeCard}
       >
-        <TouchableOpacity
+        <Pressable
           style={{
             width: "100%",
             paddingLeft: isEven ? 0 : 8,
             paddingRight: isEven ? 8 : 0,
           }}
+          className='flex justify-center mb-4 space-y-1'
           onPress={() => navigation.navigate("RecipeDetail", { ...item })}
         >
-          <Image
-            source={{ uri: item.strMealThumb || "DEFAULT_IMAGE_URL" }} // Replace with a default image URL
+          <CachedImage
+            uri={item.strMealThumb || "https://example.com/default-image.jpg"} // Add default image
             style={{
               width: "100%",
-              height: index % 3 === 0 ? hp(25) : hp(35), // Responsive height
+              height: index % 3 === 0 ? hp(25) : hp(35),
               borderRadius: 35,
             }}
+            className='bg-black/5'
           />
-          <Text style={styles.recipeTitle}>
+          <Text
+            style={{ fontSize: hp(1.5) }}
+            className='font-semibold ml-2 text-neutral-600'
+          >
             {item.strMeal.length > 20
               ? item.strMeal.slice(0, 20) + "..."
               : item.strMeal}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </Animated.View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add Ingredients</Text>
+    <View className='flex-1 p-5 bg-white'>
+      <Text className='text-2xl font-bold text-gray-900 mb-5'>
+        Add Ingredients
+      </Text>
       <TextInput
         placeholder='Enter ingredient'
         value={ingredient}
         onChangeText={setIngredient}
-        style={styles.input}
+        className='border border-gray-300 px-3 py-2 rounded-md bg-gray-100 mb-3'
       />
       <Button
         title='Add Ingredient'
         onPress={handleAddIngredient}
         color='#FFC107'
       />
-      <View style={styles.listContainer}>
+      <View className='my-3'>
         {ingredientsList.map((item, index) => (
           <View
             key={index}
-            style={styles.itemContainer}
+            className='flex-row justify-between items-center py-2'
           >
-            <Text style={styles.ingredient}>{item}</Text>
+            <Text className='text-lg text-gray-800'>{item}</Text>
             <TouchableOpacity
-              style={styles.removeButton}
+              className='bg-yellow-400 px-3 py-1 rounded-md'
               onPress={() => handleRemoveIngredient(index)}
             >
-              <Text style={styles.removeButtonText}>Remove</Text>
+              <Text className='text-white font-bold'>Remove</Text>
             </TouchableOpacity>
           </View>
         ))}
       </View>
 
-      <Text style={styles.suggestedTitle}>Suggested Recipes</Text>
+      <Text className='text-xl font-bold text-gray-900 my-3'>
+        Suggested Recipes
+      </Text>
 
       {loading ? (
         <Loading
           size='large'
-          style={styles.loading}
+          className='mt-5'
         />
       ) : (
         <MasonryList
           data={suggestedRecipes}
           keyExtractor={item => item.idMeal}
-          numColumns={2} // Same number of columns as in Recipes component
+          numColumns={2}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => renderRecipeCard(item, index)}
+          renderItem={({ item, index }) => (
+            <RenderRecipeCard
+              item={item}
+              index={index}
+              navigation={navigation}
+            />
+          )}
           onEndReachedThreshold={0.1}
-          className='mx-4 space-y-3' // Matching layout style from Recipes
+          className='mx-4 space-y-3'
         />
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "white",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: "#f5f5f5",
-  },
-  listContainer: {
-    marginVertical: 10,
-  },
-  itemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  ingredient: {
-    fontSize: 18,
-    color: "#333",
-  },
-  removeButton: {
-    backgroundColor: "#FFC107",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  removeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  suggestedTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-    color: "#333",
-  },
-  recipeCard: {
-    margin: 5,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  recipeTitle: {
-    fontSize: hp(1.5), // Responsive font size
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginTop: 5, // Margin for better spacing
-  },
-  loading: {
-    marginTop: 20,
-  },
-});

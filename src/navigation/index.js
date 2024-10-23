@@ -9,6 +9,7 @@ import WelcomeScreen from "../screens/WelcomeScreen";
 import RecipeDetailsScreen from "../screens/RecipeDetailsScreen";
 import AuthScreen from "../screens/LoginScreen";
 import AddIngredientsScreen from "../screens/IngredientsScreen";
+import IndianRecipesScreen from "../screens/IndianRecipesScreen";
 
 // Create Stack Navigator
 const Stack = createNativeStackNavigator();
@@ -48,6 +49,11 @@ function MainDrawer() {
         name='AddIngredients'
         component={AddIngredientsScreen}
         options={{ drawerLabel: "Add Ingredients" }}
+      />
+      <Drawer.Screen
+        name='Local Recipes'
+        component={IndianRecipesScreen}
+        options={{ drawerLabel: "Indian Recipes" }}
       />
     </Drawer.Navigator>
   );
