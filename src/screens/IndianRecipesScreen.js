@@ -9,16 +9,18 @@ import MasonryList from "@react-native-seoul/masonry-list";
 const cuisines = [
   {
     strCategory: "All",
-    strCategoryThumb: "https://link_to_image_for_all_cuisines",
+    strCategoryThumb:
+      "https://www.nativeplanet.com/img/2023/11/a-platter-of-traditional-punjabi-dishes-served-in-ludhiana_1700893871869-1200x675-20231125120802.jpg",
   },
   {
     strCategory: "Punjabi",
     strCategoryThumb:
-      "https://lh3.googleusercontent.com/gg/ACM6BIt6pwy9W3WujWoRZXJDa4gzDLu6riGgtgXdQJYKxY7epDddM34qFP5CdGdOBdse0hR3sTQZzg2Oy509Tog4WAdNOd_ZWxmIQojbkMQ1rBZkZ_1caODXhRCvSuMrhUW7lEzMk2Rfa5rW_3dH2QllYilEYmM7Ny35O0VwWashB3OCzGhSVBw",
+      "https://www.goindigo.in/content/dam/indigov2/6e-website/destinations/get-inspired/food-tripping/chole-bhature.jpg",
   },
   {
     strCategory: "Mughlai",
-    strCategoryThumb: "https://link_to_image_for_mughlai",
+    strCategoryThumb:
+      "https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg",
   },
   {
     strCategory: "Maharashtrian",
@@ -27,10 +29,39 @@ const cuisines = [
   },
   {
     strCategory: "North Indian",
-    strCategoryThumb: "https://link_to_image_for_north_indian",
+    strCategoryThumb:
+      "https://www.thespruceeats.com/thmb/hqqNrNhIpqPqV2u0T0K-IUzUsEo=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/SES-cuisine-of-north-india-1957883-d32a933f506d43f59ac38a8eb956884a.jpg",
+  },
+  {
+    strCategory: "Hyderabadi",
+    strCategoryThumb: "https://static.toiimg.com/photo/92522961.cms",
+  },
+  {
+    strCategory: "Andhra",
+    strCategoryThumb:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Vegetarian_Andhra_Meal.jpg/240px-Vegetarian_Andhra_Meal.jpg",
+  },
+  {
+    strCategory: "Kashmiri",
+    strCategoryThumb:
+      "https://www.khyberhotels.com/blog/wp-content/uploads/2024/07/kashmiri_wazwan-683x1024.jpg",
+  },
+  {
+    strCategory: "Goan",
+    strCategoryThumb:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiBAfnecUwFCbVXmbG8uXJ3WUinzSLwdzvDQ&s",
+  },
+  {
+    strCategory: "Chettinad",
+    strCategoryThumb:
+      "https://assets.cntraveller.in/photos/60ba17670f3a5367ec9fe1cf/master/pass/NV-Horizontal-Thali-Shot1-jpg.jpg",
+  },
+  {
+    strCategory: "Kerala",
+    strCategoryThumb:
+      "https://media.istockphoto.com/id/838927480/photo/onam-sadya-on-a-banana-leaf.jpg?s=612x612&w=0&k=20&c=gwLv5UccfysMWJn2nEPXoQfczkCTBylrmenTmHonHrc=",
   },
 ];
-
 export default function IndianRecipes() {
   const [activeCategory, setActiveCategory] = useState("All");
   const navigation = useNavigation();
@@ -45,8 +76,8 @@ export default function IndianRecipes() {
     setActiveCategory(category);
   };
 
-  const renderRecipeCard = ({ item, index }) => {
-    let isEven = index % 2 === 0; // Even items for padding adjustments
+  const RenderRecipeCard = ({ item, index }) => {
+    let isEven = index % 2 === 0;
 
     return (
       <Animated.View
@@ -54,23 +85,32 @@ export default function IndianRecipes() {
           .duration(600)
           .springify()
           .damping(12)}
-        style={{ paddingLeft: isEven ? 0 : 8, paddingRight: isEven ? 8 : 0 }}
+        style={{
+          width: "100%",
+          paddingLeft: isEven ? 0 : 8,
+          paddingRight: isEven ? 8 : 0,
+        }}
       >
         <TouchableOpacity
-          className='bg-gray-100 rounded-lg overflow-hidden shadow-lg mb-4'
+          className='flex justify-center mb-4 space-y-1'
           onPress={() => navigation.navigate("RecipeDetail", { ...item })}
         >
           <CachedImage
-            source={{ uri: item.strMealThumb }}
-            className='w-full h-40 rounded-lg'
+            uri={item.strMealThumb}
+            style={{
+              width: "100%",
+              height: index % 3 === 0 ? 200 : 250, // Adjust height as needed
+              borderRadius: 35,
+            }}
+            className='bg-black/5'
           />
-          <Text className='text-lg font-semibold text-center my-2'>
+          <Text
+            style={{ fontSize: 16 }}
+            className='font-semibold ml-2 text-neutral-600'
+          >
             {item.strMeal.length > 20
               ? item.strMeal.slice(0, 20) + "..."
               : item.strMeal}
-          </Text>
-          <Text className='text-sm text-gray-500 text-center mb-2'>
-            {item.cuisine}
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -80,7 +120,7 @@ export default function IndianRecipes() {
   return (
     <View className='flex-1 bg-white p-5'>
       <Text className='text-2xl font-bold text-gray-800 mb-5'>
-        Indian Recipes
+        Local Recipes
       </Text>
 
       <Animated.View entering={FadeInDown.duration(500).springify()}>
@@ -119,7 +159,7 @@ export default function IndianRecipes() {
         data={filteredRecipes}
         keyExtractor={item => item.id}
         numColumns={2}
-        renderItem={renderRecipeCard}
+        renderItem={RenderRecipeCard}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 10 }}
       />

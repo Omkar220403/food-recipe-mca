@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react"; // Import useCallback
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Pressable,
-  Alert, // Import Alert for error handling
+  Alert,
 } from "react-native";
 import axios from "axios";
 import MasonryList from "@react-native-seoul/masonry-list";
@@ -30,9 +30,9 @@ export default function AddIngredientsScreen() {
       const updatedList = [...ingredientsList, trimmedIngredient];
       setIngredientsList(updatedList);
       setIngredient("");
-      setLoading(true); // Start loading
-      await fetchRecipes(updatedList); // Wait for fetching to complete
-      setLoading(false); // End loading
+      setLoading(true);
+      await fetchRecipes(updatedList);
+      setLoading(false);
     } else {
       Alert.alert("Invalid ingredient", "Please enter a valid ingredient.");
     }
@@ -42,8 +42,8 @@ export default function AddIngredientsScreen() {
     index => {
       const updatedList = ingredientsList.filter((_, i) => i !== index);
       setIngredientsList(updatedList);
-      setLoading(true); // Start loading when removing
-      fetchRecipes(updatedList).then(() => setLoading(false)); // Re-fetch recipes and stop loading
+      setLoading(true);
+      fetchRecipes(updatedList).then(() => setLoading(false));
     },
     [ingredientsList]
   );
@@ -83,7 +83,7 @@ export default function AddIngredientsScreen() {
     [ingredientsList]
   );
 
-  const RenderRecipeCard = ({ item, index, navigation }) => {
+  const RenderRecipeCard = ({ item, index }) => {
     let isEven = index % 2 === 0;
 
     return (
@@ -99,17 +99,15 @@ export default function AddIngredientsScreen() {
             paddingLeft: isEven ? 0 : 8,
             paddingRight: isEven ? 8 : 0,
           }}
-          className='flex justify-center mb-4 space-y-1'
           onPress={() => navigation.navigate("RecipeDetail", { ...item })}
         >
           <CachedImage
-            uri={item.strMealThumb || "https://example.com/default-image.jpg"} // Add default image
+            uri={item.strMealThumb || "https://example.com/default-image.jpg"}
             style={{
               width: "100%",
               height: index % 3 === 0 ? hp(25) : hp(35),
               borderRadius: 35,
             }}
-            className='bg-black/5'
           />
           <Text
             style={{ fontSize: hp(1.5) }}
@@ -141,20 +139,24 @@ export default function AddIngredientsScreen() {
         color='#FFC107'
       />
       <View className='my-3'>
-        {ingredientsList.map((item, index) => (
-          <View
-            key={index}
-            className='flex-row justify-between items-center py-2'
-          >
-            <Text className='text-lg text-gray-800'>{item}</Text>
-            <TouchableOpacity
-              className='bg-yellow-400 px-3 py-1 rounded-md'
-              onPress={() => handleRemoveIngredient(index)}
+        {ingredientsList.length === 0 ? (
+          <Text className='text-gray-600'>No ingredients added yet.</Text>
+        ) : (
+          ingredientsList.map((item, index) => (
+            <View
+              key={index}
+              className='flex-row justify-between items-center py-2'
             >
-              <Text className='text-white font-bold'>Remove</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+              <Text className='text-lg text-gray-800'>{item}</Text>
+              <TouchableOpacity
+                className='bg-yellow-400 px-3 py-1 rounded-md'
+                onPress={() => handleRemoveIngredient(index)}
+              >
+                <Text className='text-white font-bold'>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
       </View>
 
       <Text className='text-xl font-bold text-gray-900 my-3'>
@@ -176,7 +178,6 @@ export default function AddIngredientsScreen() {
             <RenderRecipeCard
               item={item}
               index={index}
-              navigation={navigation}
             />
           )}
           onEndReachedThreshold={0.1}

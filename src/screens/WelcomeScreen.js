@@ -29,19 +29,19 @@ export default function WelcomeScreen() {
   }, []);
 
   return (
-    <View className='flex-1 justify-start items-center space-y-10 bg-amber-500 pt-20'>
+    <View className='flex-1 justify-start items-center bg-amber-500 pt-20'>
       <StatusBar style='light' />
-      {/* title and punchline*/}
-      <View className='mt-10 mb-4 items-center'>
-        <Text className='text-4xl font-bold text-white'>
+      {/* Title and Punchline */}
+      <View className='mt-10 mb-4 items-center px-5'>
+        <Text className='text-3xl font-bold text-white text-center'>
           Welcome to Cooking App
         </Text>
-        <Text className='text-lg font-bold text-white'>
+        <Text className='text-base font-semibold text-white text-center'>
           Start exploring delicious recipes
         </Text>
       </View>
 
-      {/* logo image with rings */}
+      {/* Logo Image with Rings */}
       <Animated.View
         className='bg-white/20 rounded-full'
         style={{ padding: ring2padding }}
@@ -57,10 +57,11 @@ export default function WelcomeScreen() {
         </Animated.View>
       </Animated.View>
 
-      <View className='space-y-4'>
+      <View className='space-y-4 px-5'>
         <TouchableOpacity
           onPress={() => navigation.navigate("AuthScreen")}
-          className='py-3 bg-amber-100 px-32 rounded-xl mt-20'
+          className='py-3 bg-amber-100 rounded-xl mt-20'
+          style={{ width: wp("80%") }} // Set width responsively
         >
           <Text className='text-xl font-bold text-center text-gray-700'>
             Sign Up
@@ -68,10 +69,10 @@ export default function WelcomeScreen() {
         </TouchableOpacity>
         <View className='flex-row justify-center'>
           <Text className='text-white font-semibold'>
-            Alreadry have an account?
+            Already have an account?
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate("AuthScreen")}>
-            <Text className='font-semibold text-amber-100'>Login</Text>
+            <Text className='font-semibold text-amber-100 ml-1'>Login</Text>
           </TouchableOpacity>
         </View>
       </View>

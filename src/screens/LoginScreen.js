@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -39,7 +38,7 @@ const AuthScreen = () => {
           "Success",
           isSignUp ? "Account Created Successfully" : "Logged in successfully"
         );
-        navigation.navigate("MainDrawer", { screen: "HomeScreen" }); // Change to "Drawer" and screen: "Home" for DrawerNavigator
+        navigation.navigate("MainDrawer", { screen: "HomeScreen" });
       } else {
         Alert.alert("Error", response.data || "An unknown error occurred");
       }
@@ -55,21 +54,29 @@ const AuthScreen = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "android" ? "padding" : "height"}
-      style={styles.container}
+      className='flex-1 justify-center items-center bg-gray-100 p-4'
     >
       <Image
         source={{ uri: "https://via.placeholder.com/150" }} // Replace with your image URL
-        style={styles.image}
+        className='w-36 h-36 rounded-full mb-5'
       />
-      <View style={styles.formContainer}>
-        <View style={styles.tabContainer}>
+      <View className='w-full bg-white rounded-lg p-5 shadow-md'>
+        <View className='flex-row justify-between mb-5'>
           <TouchableOpacity onPress={() => setIsSignUp(false)}>
-            <Text style={!isSignUp ? styles.activeTab : styles.inactiveTab}>
+            <Text
+              className={`text-lg ${
+                !isSignUp ? "font-bold text-yellow-500" : "text-gray-500"
+              }`}
+            >
               Sign in
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsSignUp(true)}>
-            <Text style={isSignUp ? styles.activeTab : styles.inactiveTab}>
+            <Text
+              className={`text-lg ${
+                isSignUp ? "font-bold text-yellow-500" : "text-gray-500"
+              }`}
+            >
               Sign up
             </Text>
           </TouchableOpacity>
@@ -77,29 +84,29 @@ const AuthScreen = () => {
         {isSignUp && (
           <TextInput
             placeholder='Name'
-            style={styles.input}
+            className='border-b border-gray-300 mb-4 p-2 text-lg'
             value={name}
             onChangeText={setName}
           />
         )}
         <TextInput
           placeholder='Email'
-          style={styles.input}
+          className='border-b border-gray-300 mb-4 p-2 text-lg'
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           placeholder='Password'
           secureTextEntry
-          style={styles.input}
+          className='border-b border-gray-300 mb-4 p-2 text-lg'
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity
           onPress={handleAuth}
-          style={styles.button}
+          className='bg-yellow-500 py-3 rounded-full items-center'
         >
-          <Text style={styles.buttonText}>
+          <Text className='text-white text-lg font-bold'>
             {isSignUp ? "Sign up" : "Login"}
           </Text>
         </TouchableOpacity>
@@ -107,64 +114,5 @@ const AuthScreen = () => {
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    padding: 16,
-  },
-  image: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    marginBottom: 20,
-  },
-  formContainer: {
-    width: "100%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  tabContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  activeTab: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFC107",
-  },
-  inactiveTab: {
-    fontSize: 18,
-    color: "#999",
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    marginBottom: 20,
-    fontSize: 16,
-    paddingVertical: 8,
-  },
-  button: {
-    backgroundColor: "#FFC107",
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});
 
 export default AuthScreen;
