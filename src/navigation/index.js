@@ -10,6 +10,7 @@ import RecipeDetailsScreen from "../screens/RecipeDetailsScreen";
 import AuthScreen from "../screens/LoginScreen";
 import AddIngredientsScreen from "../screens/IngredientsScreen";
 import IndianRecipesScreen from "../screens/IndianRecipesScreen";
+import IndianRecipeDetailsScreen from "../screens/IndianRecipesDetailedScreen";
 
 // Create Stack Navigator
 const Stack = createNativeStackNavigator();
@@ -81,6 +82,10 @@ function AppNavigation() {
         <Stack.Screen
           name='RecipeDetail'
           component={RecipeDetailsScreen}
+        />
+        <Stack.Screen
+          name='IndianRecipeDetail'
+          component={IndianRecipeDetailsScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

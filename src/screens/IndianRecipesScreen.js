@@ -93,7 +93,7 @@ export default function IndianRecipes() {
       >
         <TouchableOpacity
           className='flex justify-center mb-4 space-y-1'
-          onPress={() => navigation.navigate("RecipeDetail", { ...item })}
+          onPress={() => navigation.navigate("IndianRecipeDetail", { ...item })}
         >
           <CachedImage
             uri={item.strMealThumb}
